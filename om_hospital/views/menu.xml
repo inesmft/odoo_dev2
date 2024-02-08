@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_hospital_root"
+              name="hospital"
+              sequence="10"/>
+
+    <menuitem id="menu_hospital_operations"
+              name="operations"
+              parent="menu_hospital_root"
+              sequence="10"/>
+
+    <menuitem id="menu_patient"
+              name="patient"
+              parent="menu_hospital_operations"
+              sequence="10"/>
+
+    <menuitem id="menu_doctor"
+              name="doctor"
+              parent="menu_hospital_root"
+              sequence="10"/>
+
+    <!--parent="menu_human_resources_configuration"
+    action="hr_config_settings_action"
+    groups="base.group_system"-->
+
+
+</odoo>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="open_patient_appointments" model="ir.actions.act_window">
+        <field name="name">appointment</field>
+        <field name="res_model">appointment.patient</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[]</field>
+        <field name="context">{}</field>
+    </record>
+
+    <!--<record id="sale_order_inherit" model="ir.ui.view"> ce record permet d'ajouter le field name au module sale pour que celui ic puisse afficher le field dans sa page en indiquant qu'il doit ce referer au form de ce view-->
+    <!-- <field name="name">sale.order.inherit</field>
+     <field name="model">sale.order
+     </field> pour le champs "model" on met le nom de la table de base de donnée créer class... _name=... -->
+    <!--<field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+        <field name="partner_id" position="after">
+            <field name="name"/>
+        </field>
+    </field>
+</record> -->
+
+    <record id="view_hospital_patient_form" model="ir.ui.view">
+        <field name="name">hospital.patient.form</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <!--ici on ajoute la partie xml qui nous permet d'afficher le bouton -->
+                    <div class="oe_button_box" name="button_box"> <!--c'est standard -->
+                        <button name="open_patient_appointments" type="object" class="oe_stat_button"
+                                icon="fa-calendar"> <!--name c'est la fonction qui va s'actionner quand on clique sur le bouton et le type objet pour afficher des enregistrements liés à l'objet actuel l'icon pour l'icon qui s'affiche avec le bouton-->
+                            <field name="appointment_count" string="Appointment"
+                                   widget="statinfo"/> <!--ici on a ajouter le field qui permet de compter le nombre de rdv pour le patient -->
+                        </button>
+                        <button name="%(open_patient_appointments)d" type="action" class="oe_stat_button"
+                                icon="fa-calendar"> <!--name c'est la fonction qui va s'actionner quand on clique sur le bouton et le type action pour effectuer des actions spécifiques, l'icon pour l'icon qui s'affiche avec le bouton-->
+                            <field name="appointment_count" string="Appointment"
+                                   widget="statinfo"/> <!--ici on a ajouter le field qui permet de compter le nombre de rdv pour le patient -->
+                        </button>
+
+                    </div>
+
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="ref" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <field name="name"/>
+                        <field name="age"/>
+                        <field name="is_child"/>
+                        <field name="gender"/>
+                        <field name="doctor_id" options="{'no_open': True, 'no_create':True}"/>
+                        <field name="notes"/>
+                        <field name="capitalized_name"/>
+                    </group>
+                </sheet>
+<!--                <div class="oe_chatter">-->
+<!--                    <field name="message_follower_ids" widget="mail_followers"/>-->
+<!--                    <field name="activity_ids" widget="mail_activity"/>-->
+<!--                    <field name="message_ids" widget="mail_thread" options="{'post_refresh': 'recipie nts'}"/>-->
+<!--                </div>-->
+            </form>
+        </field>
+    </record>
+
+    <record id="view_hospital_patient_tree" model="ir.ui.view">
+        <field name="name">hospital.patient.tree</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="ref"/>
+                <field name="name"/>
+                <field name="age"/>
+                <field name="notes"/>
+                <field name="gender"/>
+                <field name="is_child"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_hospital_patient_search" model="ir.ui.view">
+        <field name="name">hospital.patient.search</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <search string="Search patients">
+                <field name="ref"/>
+                <field name="name"
+                       filter_domain="['|', ('name','ilike',self),('ref','ilike',self)]"/> <!-- pour ajouter les elements a qui il doit se referer pour sa recherche dans la barre de recherche -->
+                <field name="age"/>
+                <field name="gender"/>
+                <filter name="filter_homme" string="Homme"
+                        domain="[('gender', '=', 'homme')]"/> <!-- ceci permet d'ajouter le filtre pour filtrer celant le genre de la personne -->
+                <filter name="filter_femme" string="Femme" domain="[('gender','=', 'femme')]"/>
+                <filter name="filter_autre" string="Autre" domain="[('gender','=', 'autre')]"/>
+                <separator/>
+                <filter name="filter_enfant" string="Enfant" domain="[('is_child','=', True)]"/>
+                <group expand="0"
+                       string="Group by..."> <!-- ceci permet d'ajouter une referencer pour grouper et la reference ici est le genre de la personne donc si on veux groupper par genre on aura une liste de toute les femmes et une autre liste de tous les hommes ... groupé ensemble-->
+                    <filter string="Genre" name="group_by_gender" context="{'group_by':'gender'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--creation de l'action, ici ca sert a effectuer une action quand on clique sur le menu creer ci-dessous "menu_patient" et cette action consiste a lier les informations entrer par the user sur la base de donnée cité -->
+    <record id="action_hospital_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hospital.patient</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">
+            {'search_default_filter_enfant':1}
+        </field> <!-- {'search_default_filter_enfant':1} ceci permet de mettre se filtre comme filtre par defaut cad dés qu'on affiche la page des patients le filtre sera selectionnée par defaut dans la barre de recherche -->
+        <field name="search_view_id" ref="om_hospital.view_hospital_patient_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Your First Patient!
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_patient"
+              name="patient"
+              parent="menu_hospital_operations"
+              action="action_hospital_patient"
+              sequence="10"/>
+</odoo>
